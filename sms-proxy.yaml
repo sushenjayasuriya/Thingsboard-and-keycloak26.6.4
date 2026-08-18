@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: sms-proxy
-        image: sms-proxy:latest
+        image: sms-proxy:1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 10020
