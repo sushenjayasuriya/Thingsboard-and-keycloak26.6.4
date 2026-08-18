@@ -1,1 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: keycloak-custom:sms-final
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KC_HOSTNAME
+          value: "https://auth.utech-iiot.lk"
+        - name: KC_HOSTNAME_PORT
+          value: "-1"
+        - name: KC_PROXY
+          value: "edge"
+        - name: KC_PROXY_HEADERS
+          value: "forwarded"
+        - name: KC_HTTP_ENABLED
+          value: "true"
+        - name: KC_DB
+          value: "postgres"
+        - name: KC_DB_URL
+          value: "jdbc:postgresql://keycloak-postgres:5432/keycloak"
+        - name: KC_DB_USERNAME
+          value: "kc_user"
+        - name: KC_DB_PASSWORD
+          value: "kc_pass123"
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: "admin"
+        - name: SMS_GATEWAY_URL
+          value: "http://sms-proxy:8080/send-sms"
+        - name: JAVA_OPTS
+          value: "-Dsms.gateway.url=http://sms-proxy:8080/send-sms"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "50m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  selector:
+    app: keycloak
+  ports:
+  - port: 8080
+    targetPort: 8080
 
